@@ -1,0 +1,16 @@
+[
+{
+  "modid": "flattery",
+  "name": "Flattery",
+  "description": "Flat world generator",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Eltariel"],
+  "credits": "people",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
