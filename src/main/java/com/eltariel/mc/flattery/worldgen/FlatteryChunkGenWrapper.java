@@ -1,5 +1,6 @@
-package com.eltariel.mc.flattery;
+package com.eltariel.mc.flattery.worldgen;
 
+import com.eltariel.mc.flattery.Utils;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -10,10 +11,18 @@ import net.minecraft.world.gen.IChunkGenerator;
 import javax.annotation.Nullable;
 import java.util.List;
 
+/**
+ * Wrap an existing IChunkGenerator to allow restricting it to certain chunks only.
+ */
 public class FlatteryChunkGenWrapper implements IChunkGenerator {
     private final IChunkGenerator wrapped;
     private final IChunkGenerator voidGen;
 
+    /**
+     * Create a new FlatteryChunkGenWrapper.
+     * @param wrapped The IChunkGenerator to wrap.
+     * @param world The world that the wrapped chunk generator belongs to.
+     */
     public FlatteryChunkGenWrapper(IChunkGenerator wrapped, World world) {
         this.wrapped = wrapped;
         voidGen = new FlatteryVoidChunkGenerator(world);
@@ -44,7 +53,7 @@ public class FlatteryChunkGenWrapper implements IChunkGenerator {
 
     @Override
     public List<Biome.SpawnListEntry> getPossibleCreatures(EnumCreatureType creatureType, BlockPos pos) {
-        return ChunkZFromBlockPos(pos) == 0
+        return Utils.ChunkZFromBlockPos(pos) == 0
                 ? wrapped.getPossibleCreatures(creatureType, pos)
                 : voidGen.getPossibleCreatures(creatureType, pos);
     }
@@ -52,7 +61,7 @@ public class FlatteryChunkGenWrapper implements IChunkGenerator {
     @Nullable
     @Override
     public BlockPos getNearestStructurePos(World worldIn, String structureName, BlockPos position, boolean findUnexplored) {
-        return ChunkZFromBlockPos(position) == 0
+        return Utils.ChunkZFromBlockPos(position) == 0
                 ? wrapped.getNearestStructurePos(worldIn, structureName, position, findUnexplored)
                 : voidGen.getNearestStructurePos(worldIn, structureName, position, findUnexplored);
     }
@@ -69,12 +78,9 @@ public class FlatteryChunkGenWrapper implements IChunkGenerator {
 
     @Override
     public boolean isInsideStructure(World worldIn, String structureName, BlockPos pos) {
-        return ChunkZFromBlockPos(pos) == 0
+        return Utils.ChunkZFromBlockPos(pos) == 0
                 ? wrapped.isInsideStructure(worldIn, structureName, pos)
                 : voidGen.isInsideStructure(worldIn, structureName, pos);
     }
 
-    private int ChunkZFromBlockPos(BlockPos position) {
-        return position.getZ()%16;
-    }
 }
