@@ -1,6 +1,7 @@
 package com.eltariel.mc.flattery;
 
 import com.eltariel.mc.flattery.events.FlatteryEventHandler;
+import com.eltariel.mc.flattery.worldgen.ExtraFlatteryWorldType;
 import com.eltariel.mc.flattery.worldgen.FlatteryWorldType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -20,7 +21,7 @@ public class Flattery
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
-        System.out.println("Registering new world type");
         new FlatteryWorldType();
+        new ExtraFlatteryWorldType();
     }
 }

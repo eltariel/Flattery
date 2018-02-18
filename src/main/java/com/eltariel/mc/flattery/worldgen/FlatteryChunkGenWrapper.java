@@ -2,6 +2,7 @@ package com.eltariel.mc.flattery.worldgen;
 
 import com.eltariel.mc.flattery.Utils;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -17,22 +18,38 @@ import java.util.List;
 public class FlatteryChunkGenWrapper implements IChunkGenerator {
     private final IChunkGenerator wrapped;
     private final IChunkGenerator voidGen;
+    private final boolean singleBlock;
 
     /**
      * Create a new FlatteryChunkGenWrapper.
      * @param wrapped The IChunkGenerator to wrap.
      * @param world The world that the wrapped chunk generator belongs to.
      */
-    public FlatteryChunkGenWrapper(IChunkGenerator wrapped, World world) {
+    public FlatteryChunkGenWrapper(IChunkGenerator wrapped, World world, boolean singleBlock) {
         this.wrapped = wrapped;
+        this.singleBlock = singleBlock;
         voidGen = new FlatteryVoidChunkGenerator(world);
     }
 
     @Override
     public Chunk generateChunk(int x, int z) {
         return z == 0
-                ? wrapped.generateChunk(x, z)
+                ? mangleChunk(wrapped.generateChunk(x, z))
                 : voidGen.generateChunk(x, z);
+    }
+
+    private Chunk mangleChunk(Chunk chunk) {
+        if(singleBlock) {
+            for (int x = 0; x < 16; ++x) {
+                for (int y = 0; y < 256; ++y) {
+                    for (int z = 1; z < 16; ++z) {
+                        chunk.setBlockState(new BlockPos(x,y,z), Blocks.AIR.getDefaultState());
+                    }
+                }
+            }
+        }
+
+        return chunk;
     }
 
     @Override

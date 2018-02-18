@@ -1,19 +1,20 @@
 package com.eltariel.mc.flattery.worldgen;
 
+import com.eltariel.mc.flattery.worldgen.FlatteryChunkGenWrapper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.gen.IChunkGenerator;
 
 /**
- * A Minecraft world type that only generates chunks where Z == 0.
+ * A Minecraft world type that only generates blocks where Z == 0.
  */
-public class FlatteryWorldType extends WorldType {
-    public static final String WORLD_TYPE_NAME = "FLATTERY";
+public class ExtraFlatteryWorldType extends WorldType {
+    public static final String WORLD_TYPE_NAME = "EXTRA_FLATTERY";
 
     /**
      * Create and register the world type.
      */
-    public FlatteryWorldType() {
+    public ExtraFlatteryWorldType() {
         super(WORLD_TYPE_NAME);
     }
 
@@ -25,6 +26,6 @@ public class FlatteryWorldType extends WorldType {
      */
     @Override
     public IChunkGenerator getChunkGenerator(World world, String generatorOptions) {
-        return new FlatteryChunkGenWrapper(super.getChunkGenerator(world, generatorOptions), world, false);
+        return new FlatteryChunkGenWrapper(super.getChunkGenerator(world, generatorOptions), world, true);
     }
 }
