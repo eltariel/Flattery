@@ -4,13 +4,17 @@ import com.eltariel.mc.flattery.Utils;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.IChunkGenerator;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Wrap an existing IChunkGenerator to allow restricting it to certain chunks only.
@@ -20,6 +24,7 @@ public class FlatteryChunkGenWrapper implements IChunkGenerator {
     private final IChunkGenerator voidGen;
     private final boolean singleBlock;
 
+    private final Map<ChunkPos, Chunk> rawChunks = new HashMap<>();
     /**
      * Create a new FlatteryChunkGenWrapper.
      * @param wrapped The IChunkGenerator to wrap.
@@ -33,9 +38,20 @@ public class FlatteryChunkGenWrapper implements IChunkGenerator {
 
     @Override
     public Chunk generateChunk(int x, int z) {
+        Chunk chunk = getCachedChunk(x, z);
         return z == 0
-                ? mangleChunk(wrapped.generateChunk(x, z))
+                ? mangleChunk(chunk)
                 : voidGen.generateChunk(x, z);
+    }
+
+    private Chunk getCachedChunk(int x, int z) {
+        ChunkPos pos = new ChunkPos(x, z);
+        Chunk chunk = rawChunks.getOrDefault(pos, null);
+        if(chunk == null) {
+            chunk = wrapped.generateChunk(x, z);
+            rawChunks.put(pos, chunk);
+        }
+        return chunk;
     }
 
     private Chunk mangleChunk(Chunk chunk) {
@@ -85,12 +101,9 @@ public class FlatteryChunkGenWrapper implements IChunkGenerator {
 
     @Override
     public void recreateStructures(Chunk chunkIn, int x, int z) {
-        if(z == 0) {
-            wrapped.recreateStructures(chunkIn, x, z);
-        }
-        else {
-            voidGen.recreateStructures(chunkIn, x, z);
-        }
+        // Always recreate from wrapped generator
+        Chunk c = getCachedChunk(x, z);
+        wrapped.recreateStructures(c, x, z);
     }
 
     @Override
